@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>여행 정보 조회</title>
+  </head>
+  <body>
+    <h1>여행 정보 조회</h1>
+
+    <form id="travelForm">
+      <label for="destination">여행지:</label>
+      <input type="text" id="destination" name="destination" required />
+
+      <br />
+
+      <label for="duration">여행 기간:</label>
+      <input type="text" id="duration" name="duration" required />
+
+      <br />
+
+      <button type="button" onclick="submitForm()">조회</button>
+    </form>
+
+    <br />
+
+    <div id="result">결과: <span id="resultText"></span></div>
+
+    <script>
+      function submitForm() {
+        // 입력된 여행지와 여행 기간 가져오기
+        var destination = document.getElementById("destination").value;
+        var duration = document.getElementById("duration").value;
+
+        // API에 GET 요청
+        fetch(
+          `http://13.124.8.133:3000/api?destination=${encodeURIComponent(
+            destination
+          )}&duration=${encodeURIComponent(duration)}`
+        )
+          .then((response) => response.json())
+          .then((data) => {
+            // 받아온 데이터를 처리하여 결과에 표시
+            var resultText = JSON.stringify(data);
+            document.getElementById("resultText").innerText = resultText;
+          })
+          .catch((error) => alert(`API 요청 중 에러 발생: ${error}`));
+      }
+    </script>
+  </body>
+</html>
