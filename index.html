@@ -24,7 +24,7 @@
 
     <br />
 
-    <div id="result">결과: <span id="resultText"></span></div>
+    <div id="result"></div>
 
     <script>
       function submitForm() {
@@ -33,18 +33,75 @@
         var duration = document.getElementById("duration").value;
 
         // API에 GET 요청
-        fetch(
-          `http://13.124.8.133:3000/api?destination=${encodeURIComponent(
-            destination
-          )}&duration=${encodeURIComponent(duration)}`
-        )
+        var apiUrl = `http://13.124.8.133:3000/api?destination=${encodeURIComponent(
+          destination
+        )}&duration=${encodeURIComponent(duration)}`;
+
+        fetch(apiUrl)
           .then((response) => response.json())
           .then((data) => {
+            // 받아온 데이터를 콘솔에 출력
+            console.log("API 응답 데이터:", data);
+
             // 받아온 데이터를 처리하여 결과에 표시
-            var resultText = JSON.stringify(data);
-            document.getElementById("resultText").innerText = resultText;
+            var resultContainer = document.getElementById("result");
+            resultContainer.innerHTML = ""; // 결과 초기화
+
+            if (data.list && data.list.length > 0) {
+              // 여행 정보를 3개씩 묶어서 표시
+              for (let i = 0; i < data.list.length; i += 3) {
+                var dayInfo1 = data.list[i];
+                var dayInfo2 = data.list[i + 1];
+                var dayInfo3 = data.list[i + 2];
+
+                var dayElement = document.createElement("div");
+                dayElement.innerHTML = `<h2>Day ${dayInfo1.day}</h2>
+                                                   <p>목적지: ${
+                                                     dayInfo1.destination
+                                                   }</p>
+                                                   <p>${
+                                                     dayInfo1.description
+                                                   }</p>
+                                                   <p>놀거리로는 ${dayInfo1.plays.join(
+                                                     ", "
+                                                   )}을 추천드려요!</p>`;
+
+                if (dayInfo2) {
+                  dayElement.innerHTML += `<h2>Day ${dayInfo2.day}</h2>
+                                                        <p>목적지: ${
+                                                          dayInfo2.destination
+                                                        }</p>
+                                                        <p>${
+                                                          dayInfo2.description
+                                                        }</p>
+                                                        <p>놀거리로는 ${dayInfo2.plays.join(
+                                                          ", "
+                                                        )}을 추천드려요!</p>`;
+                }
+
+                if (dayInfo3) {
+                  dayElement.innerHTML += `<h2>Day ${dayInfo3.day}</h2>
+                                                        <p>목적지: ${
+                                                          dayInfo3.destination
+                                                        }</p>
+                                                        <p>${
+                                                          dayInfo3.description
+                                                        }</p>
+                                                        <p>놀거리로는 ${dayInfo3.plays.join(
+                                                          ", "
+                                                        )}을 추천드려요!</p>`;
+                }
+
+                resultContainer.appendChild(dayElement);
+              }
+            } else {
+              // 여행 정보가 없는 경우
+              var noDataElement = document.createElement("p");
+              noDataElement.innerText = "해당 여행 정보가 없습니다.";
+              resultContainer.appendChild(noDataElement);
+            }
           })
-          .catch((error) => alert(`API 요청 중 에러 발생: ${error}`));
+          .catch((error) => console.error("API 요청 중 에러 발생:", error));
       }
     </script>
   </body>
